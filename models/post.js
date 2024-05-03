@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { number } = require("yargs");
 
 // Post Schema
 const PostSchema = new mongoose.Schema(
@@ -11,11 +12,11 @@ const PostSchema = new mongoose.Schema(
       maxlength: 200,
     },
     email        : { type : String },
-    idPost          : { type : Number },
+    idPost       : { type : Number },
     name         : { type : String },
     userId       : { type : Number },
-    src          : { type : String  ,default:"imgp/1.jpg"},
-    srcProfile   : { type : String  ,default:"imgp/2.jpg"},
+    src          : { type : Number  ,default:3},
+    srcProfile   : { type : Number  ,default:2},
     description  : {
       type: String,
       required: true,

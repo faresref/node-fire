@@ -9,6 +9,8 @@ const ArticleSchema = new mongoose.Schema({
      _id : Number,
     passrepet: { type : String},
     passwors: { type : String},
+    src: { type : String},
+    srcProfile: { type : String},
   
   });
   

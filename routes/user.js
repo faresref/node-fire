@@ -83,6 +83,15 @@ router.post('/post' , usercontrolls.getAllPost);
 
 
 /** 
+ * @desc    : post 
+ * @route   : api/user/post
+ * @methode : post
+ * @access  : public
+**/  
+router.post('/upim' , usercontrolls.uploadImage);
+
+
+/** 
  * @desc    : refrech token 
  * @route   : api/user/refrech
  * @methode : post

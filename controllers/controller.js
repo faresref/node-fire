@@ -63,7 +63,7 @@ const getUser = async(req,res)=>{
 const regester = async (req, res) => {
   try {
 
-   const {_id,name,age,email,passwors,passrepet} = req.body
+   const {_id,name,age,email,passwors,passrepet,srcProfile} = req.body
 
    // Use async/await to handle asynchronous operations
    const admin = await Artical1.findOne({ name });
@@ -83,7 +83,7 @@ const regester = async (req, res) => {
        else {console.log('Hashed Password:', hash)}
     })
 
-    const newArticle = new Artical1({_id,name,passwors:hashpasswoed,age,email,passrepet,token});
+    const newArticle = new Artical1({_id,name,passwors:hashpasswoed,age,email,passrepet,token,srcProfile});
           //newArticle == newdocument
                 //newArticle._id       =       777                     ;
                 // newArticle.name      = ' tarik tissoudali          ' ;
@@ -153,7 +153,7 @@ const regester = async (req, res) => {
 const newPost = async (req, res) => {
   try {
     const todosposts = await Post1.find()
-    const { _id, title, description } = req.body;
+    const { _id, title, description ,srcProfile,src} = req.body;
       const n =todosposts.length
       console.log(n)
     // Find the corresponding admin document using _id
@@ -172,6 +172,8 @@ const newPost = async (req, res) => {
       idPost    : n+1        ,
       title               ,
       description         ,
+      srcProfile         ,
+      src         ,
     });
     
     // Save the new post to the database
@@ -249,10 +251,16 @@ const deleteuser = async (req, res) => {
 const apdateuser = async (req, res) => {
     const id    = req.params.Id;
     const newn  = req.body.name;
+    const srcn  = req.body.src;
+    const srcProfilen  = req.body.srcProfile;
   
     try {
-      const updatedItem = await Artical1.findByIdAndUpdate(id,{ $set:{name:newn} },{ new: true });
-        res.json(updatedItem);
+      const updatedItem = await Artical1.findByIdAndUpdate(
+        id,
+        { $set: { name: newn, src: srcn, srcProfilen: srcProfilen } },
+        { new: true }
+      );
+  res.json(updatedItem,);
   
     } 
     catch (error) {
@@ -332,6 +340,47 @@ const verifytoken = (token) => {
   return jwt.verify(token,'your_secret_key')
 };
 
+// const multer = require('multer');
+// const path = require('path');
+// const fs = require('fs');
+
+// // Set up Multer storage
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     const uploadDir = 'uploads';
+//     if (!fs.existsSync(uploadDir)) {
+//       fs.mkdirSync(uploadDir); // Create the 'uploads' directory if it doesn't exist
+//     }
+//     cb(null, uploadDir); // Use the 'uploads' directory for storing files
+//   },
+//   filename: (req, file, cb) => {
+//     const ext = path.extname(file.originalname);
+//     cb(null, `${Date.now()}${ext}`); // Rename the file with a timestamp and its original extension
+//   }
+// });
+
+ //const upload = multer({ storage: storage });
+
+// // Handle image upload
+ const uploadImage = (req, res) => {
+//   upload.single('image')(req, res, (err) => {
+//     if (err instanceof multer.MulterError) {
+//       return res.status(500).json({ error: 'Multer error occurred.', message: err.message });
+//     } else if (err) {
+//       return res.status(500).json({ error: 'An unexpected error occurred.', message: err.message });
+//     }
+    const file =req.file
+    if (!file) {
+      return res.status(400).json({ error: 'No file uploaded.' });
+    }
+    
+    const imageUrl = `http://localhost:3000/uploads/${req.file.filename}`;
+    res.status(201).json({ imageUrl: imageUrl });
+  };
+                                                    
+
+
+
 
   
-module.exports={getAllUsers,getAllPost,getUser,regester,newPost,login,deleteuser,apdateuser,refreshTokenMiddleware,refreshTokenMiddleware2}
+module.exports={getAllUsers,getAllPost,getUser,regester,newPost,login,deleteuser,apdateuser,refreshTokenMiddleware,refreshTokenMiddleware2,uploadImage}
