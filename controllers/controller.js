@@ -153,7 +153,7 @@ const regester = async (req, res) => {
 const newPost = async (req, res) => {
   try {
     const todosposts = await Post1.find()
-    const { _id, title, description ,srcProfile,src} = req.body;
+    const { _id, title, description ,src} = req.body;
       const n =todosposts.length
       console.log(n)
     // Find the corresponding admin document using _id
@@ -172,7 +172,7 @@ const newPost = async (req, res) => {
       idPost    : n+1        ,
       title               ,
       description         ,
-      srcProfile         ,
+      srcProfile :admin.srcProfile        ,
       src         ,
     });
     
