@@ -90,6 +90,13 @@ router.post('/post' , usercontrolls.getAllPost);
 **/  
 router.post('/upim' , usercontrolls.uploadImage);
 
+/** 
+ * @desc    : comment 
+ * @route   : api/user/comment
+ * @methode : post
+ * @access  : public
+**/  
+router.post('/comment' , usercontrolls.commentOnPost);
 
 /** 
  * @desc    : refrech token 

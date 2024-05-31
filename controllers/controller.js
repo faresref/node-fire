@@ -5,6 +5,8 @@ const jwt     = require('jsonwebtoken')
 //import user modul or artical
 const Artical1 =  require('../models/artical')
 const Post1 =  require('../models/post')
+const Post = require('../models/post')
+const { formatDistanceToNow } = require('date-fns');
 
 const getAllUsers = async (req,res) => {
     try{
@@ -30,16 +32,26 @@ const getAllUsers = async (req,res) => {
 //     //ila mardamch i3lmak indar warnnig (catch hta try) =>
 //     catch(error){console.log('error sheeet get all post bk'),error} 
 //     }
+
+
 const getAllPost = async (req, res) => {
   try {
-      const todosposts = await Post1.find().sort({ _id: -1 });
-      console.log('Successfully retrieved get all posts');
-      res.json(todosposts);
+    // Fetch all posts, sorted by _id in descending order
+    const todosposts = await Post1.find().sort({ _id: -1 });
+
+    // Update the formattedDate for each post
+    todosposts.forEach(post => {
+      post.formattedDate = formatDistanceToNow(new Date(post.date), { addSuffix: true });
+    });
+
+    console.log('Successfully retrieved all posts');
+    res.json(todosposts);
   } catch (error) {
-      console.error('Error occurred while fetching all posts:', error);
-      res.status(500).json({ error: 'Internal Server Error ge all post ' });
+    console.error('Error occurred while fetching all posts:', error);
+    res.status(500).json({ error: 'Internal Server Error while fetching all posts' });
   }
-}
+};
+
 
 
 const getUser = async(req,res)=>{
@@ -150,43 +162,129 @@ const regester = async (req, res) => {
 // };
 
 
+// const newPost = async (req, res) => {
+//   try {
+//     const todosposts = await Post1.find()
+//     const { _id, title, description ,src} = req.body;
+//       const n =todosposts.length
+//       console.log(n)
+//     // Find the corresponding admin document using _id
+//     const admin = await Artical1.findOne({ _id });
+
+//     // If admin is not found, send a 404 Not Found response
+//     if (!admin) {
+//       return res.status(404).json({ error: 'Admin not found' });
+//     }
+
+//     const newPost = new Post1({
+//       name   : admin.name ,
+//       name   : admin.name ,
+//       email  : admin.email,
+//       userId : admin._id  , 
+//       _id    : n+1        ,
+//       title               ,
+//       description         ,
+//       srcProfile :admin.srcProfile        ,
+//       src         ,
+//     });
+    
+//     // Save the new post to the database
+//     await newPost.save();
+
+//     // Send the newly created post as a JSON response
+//     res.json(newPost);
+//   } catch (error) {
+//     // Handle errors and send an appropriate error response
+//     console.error(error);
+//     res.status(500).json({ error: 'Internal Server Error post:' });
+//   }
+// };
+
+
+
+
+
 const newPost = async (req, res) => {
   try {
-    const todosposts = await Post1.find()
-    const { _id, title, description ,src} = req.body;
-      const n =todosposts.length
-      console.log(n)
-    // Find the corresponding admin document using _id
+    const todosposts = await Post1.find();
+    const { _id, title, description, src } = req.body;
+    const n = todosposts.length;
+    console.log(n);
+
     const admin = await Artical1.findOne({ _id });
 
-    // If admin is not found, send a 404 Not Found response
     if (!admin) {
       return res.status(404).json({ error: 'Admin not found' });
     }
 
+    const currentDate = new Date();
+    const formattedDate = formatDistanceToNow(currentDate, { addSuffix: true });
+
     const newPost = new Post1({
-      name   : admin.name ,
-      name   : admin.name ,
-      email  : admin.email,
-      userId : admin._id  , 
-      idPost    : n+1        ,
-      title               ,
-      description         ,
-      srcProfile :admin.srcProfile        ,
-      src         ,
+      name: admin.name,
+      email: admin.email,
+      userId: admin._id,
+      _id: n + 1,
+      title,
+      description,
+      srcProfile: admin.srcProfile,
+      src,
+      date: currentDate,
+      formattedDate
     });
-    
-    // Save the new post to the database
+
     await newPost.save();
 
-    // Send the newly created post as a JSON response
     res.json(newPost);
   } catch (error) {
-    // Handle errors and send an appropriate error response
-    console.error(error);
+    console.error('Error creating new post:', error);
     res.status(500).json({ error: 'Internal Server Error post:' });
   }
 };
+
+
+
+
+
+const commentOnPost = async (req, res) => {
+  try {
+    const { text, _id, userId,srcProfile,nameC } = req.body;
+
+    if (!text) {
+      return res.status(400).json({ error: "Text field is required" });
+    }
+
+    // Validate and find post by its ID
+    const post = await Post1.findById(_id);
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const currentDate = new Date();
+    const formattedDate = formatDistanceToNow(currentDate, { addSuffix: true });
+
+    const comment = {
+      user: userId,
+      text,
+      nameC,
+      srcProfile,
+      date: currentDate,
+      formattedDate
+    };
+
+    post.comments.push(comment);
+    await post.save();
+
+    res.status(200).json(post);
+  } catch (error) {
+    console.log("Error in commentOnPost controller: ", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
+
 
 const login =  async (req, res) => {
     try {
@@ -383,4 +481,4 @@ const verifytoken = (token) => {
 
 
   
-module.exports={getAllUsers,getAllPost,getUser,regester,newPost,login,deleteuser,apdateuser,refreshTokenMiddleware,refreshTokenMiddleware2,uploadImage}
+module.exports={getAllUsers,getAllPost,getUser,regester,newPost,login,deleteuser,apdateuser,refreshTokenMiddleware,refreshTokenMiddleware2,uploadImage,commentOnPost}

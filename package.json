@@ -48,6 +48,7 @@
     "cookie-signature": "^1.0.6",
     "cors": "^2.8.5",
     "cross-spawn": "^7.0.3",
+    "date-fns": "^3.6.0",
     "debug": "^2.6.9",
     "decompress-response": "^6.0.0",
     "deep-extend": "^0.6.0",
