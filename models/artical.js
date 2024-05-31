@@ -10,7 +10,7 @@ const ArticleSchema = new mongoose.Schema({
     passrepet  : { type : String },
     passwors   : { type : String },
     token      : { type : String },
-    srcProfile : { type : Number,default:"11.jpg"},
+    srcProfile : { type : String,default:"11.jpg"},
     isadmin    : { type : Boolean,
                 default : false, 
                 required: true}, 
