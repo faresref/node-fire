@@ -3,14 +3,14 @@
 
 const ArticleSchema = new mongoose.Schema({
  
-    name     : { type : String },
-    age      : { type : Number },
-    email    : { type : String },
-    _id      : { type : Number  },
-    passrepet: { type : String },
-    passwors : { type : String },
-    token    : { type : String },
-    srcProfile    : { type : Number,default:2},
+    name       : { type : String },
+    age        : { type : Number },
+    email      : { type : String },
+    _id        : { type : Number  },
+    passrepet  : { type : String },
+    passwors   : { type : String },
+    token      : { type : String },
+    srcProfile : { type : Number,default:"11.jpg"},
     isadmin    : { type : Boolean,
                 default : false, 
                 required: true}, 

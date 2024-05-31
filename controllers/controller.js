@@ -238,7 +238,7 @@ const newPost = async (req, res) => {
     res.json(newPost);
   } catch (error) {
     console.error('Error creating new post:', error);
-    res.status(500).json({ error: 'Internal Server Error post:' });
+    res.status(500).json({ error: 'Internal Server Error new post:' });
   }
 };
 
