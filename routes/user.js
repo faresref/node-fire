@@ -114,6 +114,16 @@ router.post('/refresh-token',usercontrolls.refreshTokenMiddleware)
 **/
   router.delete('/delete/:Id',verifyToken,seter,usercontrolls.deleteuser)
 
+
+/** 
+ * @desc    : delete user
+ * @route   : api/user/delete/:id
+ * @methode : delete
+ * @access  : public
+**/
+router.delete('/deletePost/:Id',usercontrolls.deletePost)
+
+
 /** 
  * @desc    : apdate user
  * @route   : api/user/apdite/:id

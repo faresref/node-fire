@@ -10,7 +10,8 @@ if (!currentuser)
 const tokenAuth  = req.header("authorization")
 const tokenDb    = currentuser.token
 const userid     = req.user.userId     
-
+console.log(userid)
+console.log('id is',id)
   if (userid    !== id     
   &&  tokenAuth !== tokenDb )
      {return res.status(403).json({ message: "Cannot delete another user's account" }) }

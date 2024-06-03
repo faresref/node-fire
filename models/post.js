@@ -11,10 +11,10 @@ const PostSchema = new mongoose.Schema({
     maxlength: 200,
   },
   email: { type: String },
-  _id: { type: Number },
+  _id: { type: Number ,default:"2"},
   name: { type: String },
   userId: { type: Number },
-  src: { type: String, default: "12.jpg" },
+  src: { type: String, default: "imgp/12.jpg" },
   srcProfile: { type: String, default: "11.jpg" },
   description: {
     type: String,

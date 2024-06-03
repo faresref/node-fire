@@ -2,10 +2,11 @@ const bcrypt  = require('bcrypt')
 
 const jwt     = require('jsonwebtoken')
 
+const cloudinary = require('cloudinary').v2;
+
 //import user modul or artical
 const Artical1 =  require('../models/artical')
 const Post1 =  require('../models/post')
-const Post = require('../models/post')
 const { formatDistanceToNow } = require('date-fns');
 
 const getAllUsers = async (req,res) => {
@@ -20,18 +21,6 @@ const getAllUsers = async (req,res) => {
     //ila mardamch i3lmak indar warnnig (catch hta try) =>
     catch(error){console.log('error sheeet get all users bk'),error} 
     }
-// const getAllPost = async (req,res) => {
-//     try{
-//         //get all articl or docum or users from db or costemer-modul(users) =>
-//         const todosposts = await Post1.find().sort(-1)  ;
-//         //testeur f lconcol  =>
-//         console.log('inchallah yasr lana ya ullah  (poooost)'  )  ;
-//         //responsable of api =>
-//         res.json(          todosposts            )  ;
-//     }
-//     //ila mardamch i3lmak indar warnnig (catch hta try) =>
-//     catch(error){console.log('error sheeet get all post bk'),error} 
-//     }
 
 
 const getAllPost = async (req, res) => {
@@ -53,7 +42,6 @@ const getAllPost = async (req, res) => {
 };
 
 
-
 const getUser = async(req,res)=>{
 
         try {
@@ -72,6 +60,8 @@ const getUser = async(req,res)=>{
               }
         
     }
+
+
 const regester = async (req, res) => {
   try {
 
@@ -112,96 +102,6 @@ const regester = async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error post bibi'})}         
 
   }
-// const newPost = async (req, res) => {
-//   try {
-
-//    const {_id,title,description} = req.body
-//    const admin = await Artical1.findOne({ _id });
-
-
-//     const newpost = new Post1({name:admin.name,description,title,email:admin.email,_id:admin._id});
-//       await newpost.save() 
-//        res.json(newpost) }     
-
-//       catch (error) {                                                
-//       console.error(error)                                        
-//       res.status(500).json({ error: 'Internal Server Error post '})}         
-
-//   }
-// const regester = async (req, res) => {
-//   try {
-//     const { _id, name, age, email, passwors, passrepet } = req.body;
-
-//     // Use async/await to handle asynchronous operations
-//     const admin = await Artical1.findOne({ name });
-
-//     // Check if the user exists
-//     if (admin) {
-//       return res.status(409).json({ message: 'User already exists. Registration failed.' });
-//     }
-
-//     // Generate new token
-//     const token = jwt.sign({ userId: _id }, 'your_secret_key', { expiresIn: '7d' });
-
-//     // Check if password is a string
-//     if (typeof passwors !== 'string') {
-//       return res.status(400).json({ error: 'Invalid password format' });
-//     }
-
-//     // Hash the password
-//     const hashPassword = bcrypt.hashSync(passwors, 10);
-
-//     const newArticle = new Artical1({ _id, name, passwors: hashPassword, age, email, passrepet, token });
-//     await newArticle.save();
-
-//     res.json({ message: 'Welcome! Registration successful.', token, userId: _id, user: { _id, name, age, email } });
-//   } catch (error) {
-//     console.error('Error during registration:', error);
-//     res.status(500).json({ error: 'Internal Server Error during registration' });
-//   }
-// };
-
-
-// const newPost = async (req, res) => {
-//   try {
-//     const todosposts = await Post1.find()
-//     const { _id, title, description ,src} = req.body;
-//       const n =todosposts.length
-//       console.log(n)
-//     // Find the corresponding admin document using _id
-//     const admin = await Artical1.findOne({ _id });
-
-//     // If admin is not found, send a 404 Not Found response
-//     if (!admin) {
-//       return res.status(404).json({ error: 'Admin not found' });
-//     }
-
-//     const newPost = new Post1({
-//       name   : admin.name ,
-//       name   : admin.name ,
-//       email  : admin.email,
-//       userId : admin._id  , 
-//       _id    : n+1        ,
-//       title               ,
-//       description         ,
-//       srcProfile :admin.srcProfile        ,
-//       src         ,
-//     });
-    
-//     // Save the new post to the database
-//     await newPost.save();
-
-//     // Send the newly created post as a JSON response
-//     res.json(newPost);
-//   } catch (error) {
-//     // Handle errors and send an appropriate error response
-//     console.error(error);
-//     res.status(500).json({ error: 'Internal Server Error post:' });
-//   }
-// };
-
-
-
 
 
 const newPost = async (req, res) => {
@@ -243,9 +143,6 @@ const newPost = async (req, res) => {
 };
 
 
-
-
-
 const commentOnPost = async (req, res) => {
   try {
     const { text, _id, userId,srcProfile,nameC } = req.body;
@@ -282,8 +179,6 @@ const commentOnPost = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
-
 
 
 const login =  async (req, res) => {
@@ -345,6 +240,41 @@ const deleteuser = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error during user deletion' })
   }
 }
+
+const deletePost = async (req, res) => {
+
+	try {
+
+    const token = req.header("Authorization")
+    if(!token){
+        return res.status(401).json({messageT:"the token not found"})}
+      
+        const decoded = jwt.verify(token,'your_secret_key')
+        req.user = decoded
+        console.log(decoded)
+
+		const post = await Post1.findById(req.params.Id);
+		if (!post) {
+			return res.status(404).json({ error: "Post not found" });
+		}
+
+		if (post.userId !== req.user.userid) {
+			return res.status(401).json({ error: "You are not authorized to delete this post" });
+		}
+
+		// if (post.img) {
+		// 	const imgId = post.img.split("/").pop().split(".")[0];
+		// 	await cloudinary.uploader.destroy(imgId);
+		// }
+
+		await Post1.findByIdAndDelete(req.params.Id);
+
+		res.status(200).json({ message: "Post deleted successfully",post });
+	} catch (error) {
+		console.log("Error in deletePost controller: ", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
 
 const apdateuser = async (req, res) => {
     const id    = req.params.Id;
@@ -432,7 +362,7 @@ const generateAccessToken = (user) => {
 };
 
 const generateRefreshToken = (decoded) => {
-  return jwt.sign({ id: decoded.id, isAdmin:' decoded.isadmin '}, "your_secret_key");
+  return jwt.sign({ userId: decoded.userId, isAdmin:decoded.isAdmin}, "your_secret_key");
 };
 const verifytoken = (token) => {
   return jwt.verify(token,'your_secret_key')
@@ -481,4 +411,4 @@ const verifytoken = (token) => {
 
 
   
-module.exports={getAllUsers,getAllPost,getUser,regester,newPost,login,deleteuser,apdateuser,refreshTokenMiddleware,refreshTokenMiddleware2,uploadImage,commentOnPost}
+module.exports={getAllUsers,getAllPost,deletePost,getUser,regester,newPost,login,deleteuser,apdateuser,refreshTokenMiddleware,refreshTokenMiddleware2,uploadImage,commentOnPost}
