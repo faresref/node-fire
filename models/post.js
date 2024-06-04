@@ -3,6 +3,7 @@ const { formatDistanceToNow } = require('date-fns');
 const { string } = require("yargs");
 
 const PostSchema = new mongoose.Schema({
+
   title: {
     type: String,
     required: true,
@@ -10,20 +11,49 @@ const PostSchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 200,
   },
-  email: { type: String },
-  _id: { type: Number ,default:"2"},
-  name: { type: String },
-  userId: { type: Number },
-  src: { type: String, default: "imgp/12.jpg" },
-  srcProfile: { type: String, default: "11.jpg" },
+
+  email: { 
+    type: String 
+  },
+
+  // _id: { 
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   require:false   },
+
+  name: { 
+    type: String 
+  },
+
+  userId: {
+     type: Number 
+    },
+
+  src: {
+     type: String, 
+     default: "imgp/12.jpg"
+     },
+
+  srcProfile: { 
+    type: String, 
+    default: "11.jpg" 
+  },
+
   description: {
     type: String,
     required: true,
     trim: true,
     minlength: 10,
   },
-  date: { type: Date, default: Date.now },
-  formattedDate: { type: String, required: true },
+
+  date: { type: Date,
+     default: Date.now 
+    },
+
+  formattedDate: {
+     type: String,
+      required: true 
+    },
+
   comments: [{
     text: {
       type: String,

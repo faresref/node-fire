@@ -62,6 +62,26 @@ const getUser = async(req,res)=>{
     }
 
 
+const getPost = async(req,res)=>{
+
+        try {
+        
+          const id = req.params.Id
+        
+          const post = await Post1.findById(id)
+        
+          !post &&  res.status(404).json({messageT:"the post not found"})
+            
+          post  &&  res.status(200).json(post)
+        
+           }
+         catch{
+          res.status(500).json({messageT:"error in get post by id server err"})
+              }
+        
+    }
+
+
 const regester = async (req, res) => {
   try {
 
@@ -104,14 +124,61 @@ const regester = async (req, res) => {
   }
 
 
+// const newPost = async (req, res) => {
+//   try {
+//     const todosposts = await Post1.find();
+//     const {  title, description, src ,userId} = req.body;
+//     const n = todosposts.length;
+//     console.log(n);
+
+//     const admin = await Artical1.findById( {userId} );
+
+//     if (!admin) {
+//       return res.status(404).json({ error: 'Admin not found' });
+//     }
+
+//     const currentDate = new Date();
+//     const formattedDate = formatDistanceToNow(currentDate, { addSuffix: true });
+
+//     const newPost = new Post1({
+//       name: admin.name,
+//       email: admin.email,
+//       userId: admin._id,
+//       _id: n + 1,
+//       title,
+//       description,
+//       srcProfile: admin.srcProfile,
+//       src,
+//       date: currentDate,
+//       formattedDate
+//     });
+
+//     await newPost.save();
+
+//     res.json(newPost);
+//   } catch (error) {
+//     console.error('Error creating new post:', error);
+//     res.status(500).json({ error: 'Internal Server Error new post:' });
+//   }
+// };
+
+
+
+
+
+// Create a new post
 const newPost = async (req, res) => {
   try {
-    const todosposts = await Post1.find();
-    const { _id, title, description, src } = req.body;
-    const n = todosposts.length;
-    console.log(n);
 
-    const admin = await Artical1.findOne({ _id });
+    // const todosposts = await Post1.find();
+    // const n = todosposts.length;
+    // console.log(n);
+
+
+    const { title, description, src, userId } = req.body;
+
+    // Find the admin by userId
+    const admin = await Artical1.findById(userId);
 
     if (!admin) {
       return res.status(404).json({ error: 'Admin not found' });
@@ -120,11 +187,12 @@ const newPost = async (req, res) => {
     const currentDate = new Date();
     const formattedDate = formatDistanceToNow(currentDate, { addSuffix: true });
 
+    // Create a new Post instance
     const newPost = new Post1({
+      
       name: admin.name,
       email: admin.email,
       userId: admin._id,
-      _id: n + 1,
       title,
       description,
       srcProfile: admin.srcProfile,
@@ -133,12 +201,13 @@ const newPost = async (req, res) => {
       formattedDate
     });
 
+    // Save the post to the database
     await newPost.save();
 
     res.json(newPost);
   } catch (error) {
     console.error('Error creating new post:', error);
-    res.status(500).json({ error: 'Internal Server Error new post:' });
+    res.status(500).json({ error: 'Internal Server Error while creating new post.' });
   }
 };
 
@@ -179,7 +248,6 @@ const commentOnPost = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 const login =  async (req, res) => {
     try {
@@ -241,38 +309,54 @@ const deleteuser = async (req, res) => {
   }
 }
 
-const deletePost = async (req, res) => {
+// const deletePost = async (req, res) => {
 
+// 	try {
+
+//     const token = req.header("Authorization")
+//     if(!token){
+//         return res.status(401).json({messageT:"the token not found"})}
+      
+//         const decoded = await jwt.verify(token,'your_secret_key')
+//         req.user = decoded
+//         console.log("mna del contr",decoded)
+
+// 		const post = await Post1.findById(req.params.Id);
+// 		if (!post) {
+// 			return res.status(404).json({ error: "Post not found" });
+// 		}
+// 		// if (post) {
+// 		// 	return res.status(200).json({post});
+// 		// }
+
+// 		if (post._id !== decoded.userId) {
+// 			return res.status(401).json({ error: "You are not authorized to delete this post" });
+// 		}
+
+// 		// if (post.img) {
+// 		// 	const imgId = post.img.split("/").pop().split(".")[0];
+// 		// 	await cloudinary.uploader.destroy(imgId);
+// 		// }
+
+// 		await Post1.findByIdAndDelete(req.params.Id);
+
+// 		res.status(200).json({ message: "Post deleted successfully",post });
+// 	} catch (error) {
+// 		console.log("Error in deletePost controller: ", error);
+// 		res.status(500).json({ error: "Internal server error" });
+// 	}
+// };
+const deletePost = async (req, res) => {
 	try {
 
-    const token = req.header("Authorization")
-    if(!token){
-        return res.status(401).json({messageT:"the token not found"})}
-      
-        const decoded = jwt.verify(token,'your_secret_key')
-        req.user = decoded
-        console.log(decoded)
-
 		const post = await Post1.findById(req.params.Id);
-		if (!post) {
-			return res.status(404).json({ error: "Post not found" });
-		}
 
-		if (post.userId !== req.user.userid) {
-			return res.status(401).json({ error: "You are not authorized to delete this post" });
-		}
+		await Post1.findByIdAndDelete(req.params.id);
 
-		// if (post.img) {
-		// 	const imgId = post.img.split("/").pop().split(".")[0];
-		// 	await cloudinary.uploader.destroy(imgId);
-		// }
-
-		await Post1.findByIdAndDelete(req.params.Id);
-
-		res.status(200).json({ message: "Post deleted successfully",post });
+		res.status(200).json({ message: 'Post deleted successfully', postis:post });
 	} catch (error) {
-		console.log("Error in deletePost controller: ", error);
-		res.status(500).json({ error: "Internal server error" });
+		console.error('Error in deletePost controller: ', error);
+		res.status(500).json({ error: 'Internal server error' });
 	}
 };
 
@@ -328,8 +412,6 @@ const refreshTokenMiddleware = async (req, res) => {
 
 };
 
-
-
 const refreshTokenMiddleware2 = (req, res) => {
   let refreshTokens = [];
 
@@ -364,6 +446,7 @@ const generateAccessToken = (user) => {
 const generateRefreshToken = (decoded) => {
   return jwt.sign({ userId: decoded.userId, isAdmin:decoded.isAdmin}, "your_secret_key");
 };
+
 const verifytoken = (token) => {
   return jwt.verify(token,'your_secret_key')
 };
@@ -411,4 +494,4 @@ const verifytoken = (token) => {
 
 
   
-module.exports={getAllUsers,getAllPost,deletePost,getUser,regester,newPost,login,deleteuser,apdateuser,refreshTokenMiddleware,refreshTokenMiddleware2,uploadImage,commentOnPost}
+module.exports={getAllUsers,getAllPost,deletePost,getUser,getPost,regester,newPost,login,deleteuser,apdateuser,refreshTokenMiddleware,refreshTokenMiddleware2,uploadImage,commentOnPost}

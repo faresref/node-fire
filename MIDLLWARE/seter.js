@@ -2,9 +2,9 @@
 
 try{
 const Artical1 =  require('../models/artical')
-const id = req.params.Id
+const id = req.params.id
 const currentuser = await Artical1.findById(id)
-if (!currentuser)
+ if (!currentuser)
 {return res.status(404).json({ message: 'User is not found Can not delete' }) }
 
 const tokenAuth  = req.header("authorization")
@@ -15,8 +15,8 @@ console.log('id is',id)
   if (userid    !== id     
   &&  tokenAuth !== tokenDb )
      {return res.status(403).json({ message: "Cannot delete another user's account" }) }
-     next()}
- catch (error) {
+     next()
+  }catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
   }

@@ -9,7 +9,7 @@ const seter = require('../MIDLLWARE/seter');
 const seterAdmin = require('../MIDLLWARE/seterAdmin');
 const refreshTokenMiddleware2 = require('../MIDLLWARE/refrech');
 const refreshTokenMiddleware = require('../MIDLLWARE/refrech');
-const chec = require('../MIDLLWARE/chek-token');
+const siterpost= require('../MIDLLWARE/siterpost');
 
 
 //conect database
@@ -42,6 +42,17 @@ router.get('/' ,verifyToken , usercontrolls.getAllUsers )
 | * @access  : public             |
 __________________________________|*/
 router.get("/1/:Id",usercontrolls.getUser)
+
+
+
+/**_______________________________
+| * @desc    : get one  user      |
+| * @route   : api/user/:id       |
+| * @methode : get                |
+| * @access  : public             |
+__________________________________|*/
+router.get("/post/:Id",usercontrolls.getPost)
+
 
 /****************************************
 *  @desc    : create user and regester  *
@@ -121,7 +132,7 @@ router.post('/refresh-token',usercontrolls.refreshTokenMiddleware)
  * @methode : delete
  * @access  : public
 **/
-router.delete('/deletePost/:Id',usercontrolls.deletePost)
+router.delete('/deletePost/:Id',verifyToken,siterpost,usercontrolls.deletePost)
 
 
 /** 
