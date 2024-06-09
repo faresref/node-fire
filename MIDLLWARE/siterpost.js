@@ -17,7 +17,7 @@ const seterpost = async (req,res,next) =>{
      if (!currentuser) {
 			return res.status(404).json({ error: 'user not found' });
 		}
-
+console.log(currentpost.userId)
         
     const tokenAuth  = req.header("authorization")
     const tokenDb    = currentuser.token
@@ -25,7 +25,8 @@ const seterpost = async (req,res,next) =>{
     console.log(userid)
     console.log('id is',id)
 
-	if (tokenAuth!=tokenDb
+    // tokenDb!=tokenAuth
+	if (userid!=currentpost.userId
         ) {
 			return res.status(401).json({ error: 'You are not authorized to delete this post' });
 		}

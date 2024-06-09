@@ -5,8 +5,8 @@ const jwt     = require('jsonwebtoken')
 const cloudinary = require('cloudinary').v2;
 
 //import user modul or artical
-const Artical1 =  require('../models/artical')
-const Post1 =  require('../models/post')
+const Artical1 =  require('../models/artical.model')
+const Post1 =  require('../models/post.model')
 const { formatDistanceToNow } = require('date-fns');
 
 const getAllUsers = async (req,res) => {
@@ -22,22 +22,43 @@ const getAllUsers = async (req,res) => {
     catch(error){console.log('error sheeet get all users bk'),error} 
     }
 
-
 const getAllPost = async (req, res) => {
   try {
     // Fetch all posts, sorted by _id in descending order
-    const todosposts = await Post1.find().sort({ _id: -1 });
+    const todosposts = await Post1.find().sort({ _id: -1 }).exec();
 
-    // Update the formattedDate for each post
-    todosposts.forEach(post => {
-      post.formattedDate = formatDistanceToNow(new Date(post.date), { addSuffix: true });
-    });
+    // Create a new array with the updated formattedDate for each post
+    const updatedPosts = todosposts.map(post => ({
+      ...post._doc,
+      formattedDate: formatDistanceToNow(new Date(post.date), { addSuffix: true })
+    }));
 
     console.log('Successfully retrieved all posts');
-    res.json(todosposts);
+    res.json(updatedPosts);
   } catch (error) {
     console.error('Error occurred while fetching all posts:', error);
     res.status(500).json({ error: 'Internal Server Error while fetching all posts' });
+  }
+};
+
+
+const getAllComment = async (req, res) => {
+  try {
+    // Assuming you want to get comments from a specific post, you need to specify the postId
+    const postId = req.params.postId;
+
+    // Find the post by ID and populate the comments field if it references another collection
+    const post = await Post1.findById(postId).populate('comments');
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    console.log('Successfully retrieved all comments');
+    res.json(post.comments);
+  } catch (error) {
+    console.error('Error occurred while fetching all comments:', error);
+    res.status(500).json({ error: 'Internal Server Error while fetching all comments' });
   }
 };
 
@@ -123,7 +144,6 @@ const regester = async (req, res) => {
 
   }
 
-
 // const newPost = async (req, res) => {
 //   try {
 //     const todosposts = await Post1.find();
@@ -167,15 +187,15 @@ const regester = async (req, res) => {
 
 
 // Create a new post
+
 const newPost = async (req, res) => {
   try {
-
-    // const todosposts = await Post1.find();
-    // const n = todosposts.length;
-    // console.log(n);
-
-
     const { title, description, src, userId } = req.body;
+
+    // Validate request body
+    if (!title || !description || !userId) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
 
     // Find the admin by userId
     const admin = await Artical1.findById(userId);
@@ -189,7 +209,6 @@ const newPost = async (req, res) => {
 
     // Create a new Post instance
     const newPost = new Post1({
-      
       name: admin.name,
       email: admin.email,
       userId: admin._id,
@@ -210,7 +229,6 @@ const newPost = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error while creating new post.' });
   }
 };
-
 
 const commentOnPost = async (req, res) => {
   try {
@@ -351,7 +369,7 @@ const deletePost = async (req, res) => {
 
 		const post = await Post1.findById(req.params.Id);
 
-		await Post1.findByIdAndDelete(req.params.id);
+		await Post1.findByIdAndDelete(req.params.Id);
 
 		res.status(200).json({ message: 'Post deleted successfully', postis:post });
 	} catch (error) {
@@ -489,9 +507,5 @@ const verifytoken = (token) => {
     res.status(201).json({ imageUrl: imageUrl });
   };
                                                     
-
-
-
-
   
-module.exports={getAllUsers,getAllPost,deletePost,getUser,getPost,regester,newPost,login,deleteuser,apdateuser,refreshTokenMiddleware,refreshTokenMiddleware2,uploadImage,commentOnPost}
+module.exports={getAllUsers,getAllPost,getAllComment,deletePost,getUser,getPost,regester,newPost,login,deleteuser,apdateuser,refreshTokenMiddleware,refreshTokenMiddleware2,uploadImage,commentOnPost}
