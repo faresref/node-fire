@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const Artical1 =  require('../models/artical')
+const Artical1 =  require('../models/user.model')
 
 // Middleware function to refresh tokens
 const refreshTokenMiddleware = async(req, res, next) => {

@@ -2,8 +2,8 @@ const seterpost = async (req,res,next) =>{
 
     try{
 
-    const post1 =  require('../models/post')
-    const artical1 =  require('../models/artical')
+    const post1    =  require('../models/post.model')
+    const artical1 =  require('../models/user.model')
 
     const id = req.params.Id
     const userid     = req.user.userId 

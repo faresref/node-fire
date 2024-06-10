@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 
-const postcontrolls = require('../controllers/auth.controller.js')
+const postcontrolls = require('../controllers/post.controller.js')
 const verifyToken = require('../MIDLLWARE/verfytoken.js');
 const siterpost= require('../MIDLLWARE/siterpost.js');
 

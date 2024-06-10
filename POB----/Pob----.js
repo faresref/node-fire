@@ -595,3 +595,284 @@
 //     console.error('Error connecting to MongoDB:', error);
 //   });
 // });// app.js
+
+//app js ----------------------------------------------------------------
+
+// const express = require('express');
+
+// const userpath = require('./routes/auth.route');
+// const postpath = require('./routes/auth.route');
+
+// require('dotenv').config();
+
+// const { connectMongoDB } = require('./db/connectMongoDB');
+// app  = express();
+//       cors = require('cors');
+//       port = 7000;
+
+// app.use(cors());
+// app.use(express.json())
+// app.use("/api/user",userpath)
+// app.use("/api/posts", userpath);
+
+
+// app.listen(port||7000, () => {
+// console.log('Server is running on port', port)
+// connectMongoDB()
+// })
+
+//connect mongoDB--------------------------------------------------------------------
+// const mongoose = require('mongoose');
+
+// const connectMongoDB = async () => {
+//     try {
+//         await mongoose.connect(process.env.URL, {
+//             useNewUrlParser: true,
+//             useUnifiedTopology: true,
+//             useFindAndModify: false,
+//             useCreateIndex: true
+//         });
+//         console.log('Connected successfully');
+//     } catch (error) {
+//         console.error('Connection error:', error);
+//     }
+// };
+
+// module.exports = { connectMongoDB };
+
+//user controller ------------------------------------------------------------------------------
+const getAllPost = async (req, res) => {
+      try {
+        // Fetch all posts, sorted by _id in descending order
+        const todosposts = await Post1.find().sort({ _id: -1 }).exec();
+    
+        // Create a new array with the updated formattedDate for each post
+        const updatedPosts = todosposts.map(post => ({
+          ...post._doc,
+          formattedDate: formatDistanceToNow(new Date(post.date), { addSuffix: true })
+        }));
+    
+        console.log('Successfully retrieved all posts');
+        res.json(updatedPosts);
+      } catch (error) {
+        console.error('Error occurred while fetching all posts:', error);
+        res.status(500).json({ error: 'Internal Server Error while fetching all posts' });
+      }
+    };
+    
+    
+    const getAllComment = async (req, res) => {
+      try {
+        // Assuming you want to get comments from a specific post, you need to specify the postId
+        const postId = req.params.postId;
+    
+        // Find the post by ID and populate the comments field if it references another collection
+        const post = await Post1.findById(postId).populate('comments');
+    
+        if (!post) {
+          return res.status(404).json({ error: 'Post not found' });
+        }
+    
+        console.log('Successfully retrieved all comments');
+        res.json(post.comments);
+      } catch (error) {
+        console.error('Error occurred while fetching all comments:', error);
+        res.status(500).json({ error: 'Internal Server Error while fetching all comments' });
+      }
+    };
+
+    
+const getPost = async(req,res)=>{
+
+      try {
+      
+        const id = req.params.Id
+      
+        const post = await Post1.findById(id)
+      
+        !post &&  res.status(404).json({messageT:"the post not found"})
+          
+        post  &&  res.status(200).json(post)
+      
+         }
+       catch{
+        res.status(500).json({messageT:"error in get post by id server err"})
+            }
+      
+  }
+
+  // const newPost = async (req, res) => {
+//   try {
+//     const todosposts = await Post1.find();
+//     const {  title, description, src ,userId} = req.body;
+//     const n = todosposts.length;
+//     console.log(n);
+
+//     const admin = await Artical1.findById( {userId} );
+
+//     if (!admin) {
+//       return res.status(404).json({ error: 'Admin not found' });
+//     }
+
+//     const currentDate = new Date();
+//     const formattedDate = formatDistanceToNow(currentDate, { addSuffix: true });
+
+//     const newPost = new Post1({
+//       name: admin.name,
+//       email: admin.email,
+//       userId: admin._id,
+//       _id: n + 1,
+//       title,
+//       description,
+//       srcProfile: admin.srcProfile,
+//       src,
+//       date: currentDate,
+//       formattedDate
+//     });
+
+//     await newPost.save();
+
+//     res.json(newPost);
+//   } catch (error) {
+//     console.error('Error creating new post:', error);
+//     res.status(500).json({ error: 'Internal Server Error new post:' });
+//   }
+// };
+
+
+
+
+
+// Create a new post
+
+
+const newPost = async (req, res) => {
+      try {
+        const { title, description, src, userId } = req.body;
+    
+        // Validate request body
+        if (!title || !description || !userId) {
+          return res.status(400).json({ error: 'Missing required fields' });
+        }
+    
+        // Find the admin by userId
+        const admin = await Artical1.findById(userId);
+    
+        if (!admin) {
+          return res.status(404).json({ error: 'Admin not found' });
+        }
+    
+        const currentDate = new Date();
+        const formattedDate = formatDistanceToNow(currentDate, { addSuffix: true });
+    
+        // Create a new Post instance
+        const newPost = new Post1({
+          name: admin.name,
+          email: admin.email,
+          userId: admin._id,
+          title,
+          description,
+          srcProfile: admin.srcProfile,
+          src,
+          date: currentDate,
+          formattedDate
+        });
+    
+        // Save the post to the database
+        await newPost.save();
+    
+        res.json(newPost);
+      } catch (error) {
+        console.error('Error creating new post:', error);
+        res.status(500).json({ error: 'Internal Server Error while creating new post.' });
+      }
+    };
+    
+    const commentOnPost = async (req, res) => {
+      try {
+        const { text, _id, userId,srcProfile,nameC } = req.body;
+    
+        if (!text) {
+          return res.status(400).json({ error: "Text field is required" });
+        }
+    
+        // Validate and find post by its ID
+        const post = await Post1.findById(_id);
+    
+        if (!post) {
+          return res.status(404).json({ error: "Post not found" });
+        }
+    
+        const currentDate = new Date();
+        const formattedDate = formatDistanceToNow(currentDate, { addSuffix: true });
+    
+        const comment = {
+          user: userId,
+          text,
+          nameC,
+          srcProfile,
+          date: currentDate,
+          formattedDate
+        };
+    
+        post.comments.push(comment);
+        await post.save();
+    
+        res.status(200).json(post);
+      } catch (error) {
+        console.log("Error in commentOnPost controller: ", error);
+        res.status(500).json({ error: "Internal server error" });
+      }
+    };
+    
+
+// const deletePost = async (req, res) => {
+
+// 	try {
+
+//     const token = req.header("Authorization")
+//     if(!token){
+//         return res.status(401).json({messageT:"the token not found"})}
+      
+//         const decoded = await jwt.verify(token,'your_secret_key')
+//         req.user = decoded
+//         console.log("mna del contr",decoded)
+
+// 		const post = await Post1.findById(req.params.Id);
+// 		if (!post) {
+// 			return res.status(404).json({ error: "Post not found" });
+// 		}
+// 		// if (post) {
+// 		// 	return res.status(200).json({post});
+// 		// }
+
+// 		if (post._id !== decoded.userId) {
+// 			return res.status(401).json({ error: "You are not authorized to delete this post" });
+// 		}
+
+// 		// if (post.img) {
+// 		// 	const imgId = post.img.split("/").pop().split(".")[0];
+// 		// 	await cloudinary.uploader.destroy(imgId);
+// 		// }
+
+// 		await Post1.findByIdAndDelete(req.params.Id);
+
+// 		res.status(200).json({ message: "Post deleted successfully",post });
+// 	} catch (error) {
+// 		console.log("Error in deletePost controller: ", error);
+// 		res.status(500).json({ error: "Internal server error" });
+// 	}
+// };
+const deletePost = async (req, res) => {
+	try {
+
+		const post = await Post1.findById(req.params.Id);
+
+		await Post1.findByIdAndDelete(req.params.Id);
+
+		res.status(200).json({ message: 'Post deleted successfully', postis:post });
+	} catch (error) {
+		console.error('Error in deletePost controller: ', error);
+		res.status(500).json({ error: 'Internal server error' });
+	}
+};

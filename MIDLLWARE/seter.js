@@ -1,7 +1,7 @@
  const seter = async (req,res,next) =>{
 
 try{
-const Artical1 =  require('../models/artical')
+const Artical1 =  require('../models/user.model')
 const id = req.params.id
 const currentuser = await Artical1.findById(id)
  if (!currentuser)

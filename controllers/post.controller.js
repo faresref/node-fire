@@ -1,5 +1,5 @@
 //import user modul or artical
-const Artical1 =  require('../models/artical.model')
+const Artical1 =  require('../models/user.model')
 const Post1 =  require('../models/post.model')
 
 const { formatDistanceToNow } = require('date-fns');
