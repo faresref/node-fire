@@ -95,6 +95,7 @@ const userControls = require('../controllers/auth.controller.js');  // Ensure th
 const verifyToken = require('../MIDLLWARE/verfytoken');
 const seter = require('../MIDLLWARE/seter');
 const seterAdmin = require('../MIDLLWARE/seterAdmin');
+const verfytoken = require('../MIDLLWARE/verfytoken');
 
 /** -----------------------------------
 | * @desc    : Get all users
@@ -142,7 +143,7 @@ router.post('/upim', userControls.uploadImage);
  * @method  : POST
  * @access  : Public
 **/  
-router.post('/refresh-token', userControls.refreshTokenMiddleware);
+router.post('/refresh-token',verfytoken, userControls.refreshTokenMiddleware);
 
 /** 
  * @desc    : Delete user

@@ -162,16 +162,17 @@ const refreshTokenMiddleware = async (req, res) => {
 
   try {
 
-  const token = req.headers.authorization  
- if( !token ){ return res.status(401).json("You are not authenticated!")}
+//   const token = req.headers.authorization  
+//  if( !token ){ return res.status(401).json("You are not authenticated!")}
 
-  const decoded = await verifytoken(token)
-  const id    = decoded.userId;
+//   const decoded = await jwt.verify(token,'your_secret_key')
+  const decoded    = req.user
   console.log(decoded)
-
+  
   const token1 = await generateRefreshToken(decoded)  
-  const updatedItem = await Artical1.findByIdAndUpdate(id,{ $set:{token:token1} },{ new: true });
-  res.json({updatedItem,userId:id});
+
+  const updatedItem = await Artical1.findByIdAndUpdate(decoded.userId,{ $set:{token:token1} },{ new: true });
+  res.json({updatedItem,userId:decoded.userId});
 
   if (decoded.exp < Date.now() / 1000) {
     // Token expired, redirect to refresh token endpoint
