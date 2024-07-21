@@ -28,10 +28,13 @@ const PostSchema = new mongoose.Schema({
      type: Number 
     },
 
-  src: {
-     type: String, 
-     default: "imgp/12.jpg"
-     },
+    image: {
+      type: Object,
+      default: {
+        url: "",
+        publicId: null,
+      },
+    },
 
   srcProfile: { 
     type: String, 

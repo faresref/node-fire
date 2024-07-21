@@ -2,43 +2,23 @@ const bcrypt  = require('bcrypt')
 
 const jwt     = require('jsonwebtoken')
 
+const path = require("path");
+
 const Artical1 =  require('../models/user.model')
 
-const getAllUsers = async (req,res) => {
-    try{
-        //get all articl or docum or users from db or costemer-modul(users) =>
-        const todosarticles = await Artical1.find().sort({age:-1})  ;
-        //testeur f lconcol  =>
-        console.log('inchallah yasr lana ya ullah'  )  ;
-        //responsable of api =>
-        res.json(          todosarticles            )  ;
-    }
-    //ila mardamch i3lmak indar warnnig (catch hta try) =>
-    catch(error){console.log('error sheeet get all users bk'),error} 
-    }
+const nodemailer = require('nodemailer');
 
-const getUser = async(req,res)=>{
+const fs = require('fs');
 
-        try {
-        
-          const id = req.params.Id
-        
-          const user = await Artical1.findById(id)
-        
-          !user &&  res.status(404).json({messageT:"the user not found"})
-            
-          user  &&  res.status(200).json(user)
-        
-           }
-         catch{
-          res.status(500).json({messageT:"error in get user by id server err"})
-              }
-        
-    }
+const {
+  cloudinaryUploadImage,
+  cloudinaryRemoveImage,
+  cloudinaryRemoveMultipleImage
+} = require("../MIDLLWARE/cloudinary.JS")
+
 
 const regester = async (req, res) => {
   try {
-
    const {_id,name,age,email,passwors,passrepet,srcProfile} = req.body
 
    // Use async/await to handle asynchronous operations
@@ -111,52 +91,34 @@ const login =  async (req, res) => {
     }
   }
 
-const deleteuser = async (req, res) => {
-   const id = req.params.Id
-  // const currentuser = await Artical1.findById(id)
-  // if (!currentuser)
-  // {return res.status(404).json({ message: 'User is not found Can not delete' }) }
-  
-  // const tokenAuth  = req.header("authorization")
-  // const tokenDb    = currentuser.token
-  // const userid     = req.user.userId
-  //   if (userid    !== id     
-  //   &&  tokenAuth !== tokenDb )
-  //      {return res.status(403).json({ message: "Cannot delete another user's account" }) }
+ 
+const sendemailc = async (req, res) => {
 
-  try {
-    const userid     = 1
-    const user = await Artical1.findById(userid)
-    const artical = await Artical1.findByIdAndDelete(id)
-       res.json(artical)
-   
-  } 
-  catch (error) {
-    console.error('Error deleting user:', error)
-    res.status(500).json({ message: 'Internal Server Error during user deletion' })
-  }
-}
+console.log('is run')
 
-const apdateuser = async (req, res) => {
-    const id    = req.params.Id;
-    const newn  = req.body.name;
-    const srcn  = req.body.src;
-    const srcProfilen  = req.body.srcProfile;
-  
-    try {
-      const updatedItem = await Artical1.findByIdAndUpdate(
-        id,
-        { $set: { name: newn, src: srcn, srcProfilen: srcProfilen } },
-        { new: true }
-      );
-  res.json(updatedItem,);
-  
-    } 
-    catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Server error 3andk error f updite' });
-    }
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'reffaress@gmail.com',
+    pass: 'fares.ref146612'
   }
+});
+
+const mailOptions = {
+  from: 'reffaress@gmail.com',
+  to: 'reffaress@gmail.com',
+  subject: 'Sending Email using Node.js',
+  text: 'That was easy!'
+};
+
+transporter.sendMail(mailOptions, function(error, info){
+  if (error) {
+    console.log(error);
+  } else {
+    console.log('Email sent: ' + info.response);
+  }
+});
+};
 
 const refreshTokenMiddleware = async (req, res) => {
 
@@ -265,4 +227,10 @@ const generateRefreshToken = (decoded) => {
   };
                                                     
   
-module.exports={getAllUsers,getUser,regester,login,deleteuser,apdateuser,refreshTokenMiddleware,refreshTokenMiddleware2,uploadImage}
+module.exports={
+  regester,
+  login,
+  sendemailc,
+  refreshTokenMiddleware,
+  refreshTokenMiddleware2,
+  uploadImage}

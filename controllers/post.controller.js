@@ -1,8 +1,11 @@
 //import user modul or artical
 const Artical1 =  require('../models/user.model')
 const Post1 =  require('../models/post.model')
+const path =  require('path')
+const fs =  require('fs')
 
 const { formatDistanceToNow } = require('date-fns');
+const { cloudinaryUploadImage } = require('../MIDLLWARE/cloudinary.JS');
 
 const getAllPost = async (req, res) => {
     try {
@@ -44,40 +47,56 @@ const getAllPost = async (req, res) => {
 
 const newPost = async (req, res) => {
     try {
-      const { title, description, src, userId } = req.body;
+      const { title, description, image, userId } = req.body;
   
-      // Validate request body
-      if (!title || !description || !userId) {
-        return res.status(400).json({ error: 'Missing required fields' });
-      }
+  // 1.Validate request body
+     if (!title || !description || !userId) {
+       return res.status(400).json({ error: 'Missing required fields 1' });
+     }
   
-      // Find the admin by userId
-      const admin = await Artical1.findById(userId);
+ // 2. Validation for image
+  if (!req.file) {
+    return res.status(400).json({ message: "no image provided" });
+  }
+
+ // 3. Upload photo
+ const imagePath = path.join(__dirname, `../images/${req.file.filename}`);
+ const result = await cloudinaryUploadImage(imagePath);
+
+ // 4.Find the admin by userId
+    const admin = await Artical1.findById(userId);
+     if (!admin) {
+       return res.status(404).json({ error: 'Admin not found' });
+     }
+ // 5. Create thw date 
+   const currentDate = new Date();
+   const formattedDate = formatDistanceToNow(currentDate, { addSuffix: true });
   
-      if (!admin) {
-        return res.status(404).json({ error: 'Admin not found' });
-      }
+  // 6. Create a new Post instance
+   const newPost = new Post1({
+     name: admin.name,
+     email: admin.email,
+     userId: admin._id,
+     title,
+     description,
+     srcProfile: admin.srcProfile,
+     image: {
+      url: result.secure_url,
+      publicId: result.public_id,
+    },
+     date: currentDate,
+     formattedDate
+   });
   
-      const currentDate = new Date();
-      const formattedDate = formatDistanceToNow(currentDate, { addSuffix: true });
+   // 7.Save the post to the database
+   await newPost.save();
+
+  // 8. Send response to the client
+   res.json(newPost);
   
-      // Create a new Post instance
-      const newPost = new Post1({
-        name: admin.name,
-        email: admin.email,
-        userId: admin._id,
-        title,
-        description,
-        srcProfile: admin.srcProfile,
-        src,
-        date: currentDate,
-        formattedDate
-      });
-  
-      // Save the post to the database
-      await newPost.save();
-  
-      res.json(newPost);
+  // 9. Remove image from the server
+  fs.unlinkSync(imagePath);
+
     } catch (error) {
       console.error('Error creating new post:', error);
       res.status(500).json({ error: 'Internal Server Error while creating new post.' });
