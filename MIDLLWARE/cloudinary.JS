@@ -54,9 +54,9 @@ const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 
 cloudinary.config({
-  cloud_name: process.env.doo7n85of,
+  cloud_name: 'doo7n85of',
   api_key:    313214681741639,
-  api_secret: EMmeLBjndHhbx0YK05InjTAgNks,
+  api_secret: 'EMmeLBjndHhbx0YK05InjTAgNks',
 });
 
 const cloudinaryUploadImage = async (filePath) => {
