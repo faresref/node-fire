@@ -16,6 +16,8 @@ const { auth } = require('firebase-admin');
       port = 7000;
 
 app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(bodyParser.json());
 app.use(express.json())
 app.use("/api/auth",authpath);
