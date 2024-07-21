@@ -119,10 +119,19 @@ const newPost = async (req, res) => {
       return res.status(400).json({ message: "No image provided" });
     }
 
-     // 3. Upload photo
+ // 3. Upload photo
  const imagePath = path.join(__dirname, `../images/${req.file.filename}`);
- const result = await cloudinaryUploadImage(imagePath);
- 
+
+
+    let result;
+    try {
+      result = await cloudinaryUploadImage(imagePath);
+      console.log('Cloudinary upload result:', result);
+    } catch (error) {
+      console.error('Error uploading to Cloudinary:', error);
+      return res.status(500).json({ error: `Cloudinary upload error: ${error.message}` });
+    }
+
     // 4. Find the admin by userId
     const admin = await Artical1.findById(userId);
     if (!admin) {
