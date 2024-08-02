@@ -10,7 +10,7 @@ const { cloudinaryUploadImage } = require('../MIDLLWARE/cloudinary.JS');
 const getAllPost = async (req, res) => {
     try {
       // Fetch all posts, sorted by _id in descending order
-      const todosposts = await Post1.find().sort({ _id: -1 }).exec().populate("Module", ["-password"]);
+      const todosposts = await Post1.find().sort({ _id: -1 }).exec()
       ;
   
       // Create a new array with the updated formattedDate for each post
