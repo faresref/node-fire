@@ -1,7 +1,10 @@
 const express = require('express');
+
 const router = express.Router();
 
 const userControls = require('../controllers/auth.controller.js');
+
+const photoUpload = require('../MIDLLWARE/photoUpload.js');
 
 /****************************************
 | * @desc    : Create user and register
@@ -9,7 +12,7 @@ const userControls = require('../controllers/auth.controller.js');
 | * @method  : POST
 | * @access  : Public
 *****************************************/
-router.post('/register', userControls.regester);
+router.post('/register', photoUpload.single("image"), userControls.register);
 
 /** 
  * @desc    : Login

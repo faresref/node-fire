@@ -121,33 +121,33 @@ const deleteuser = async (req, res) => {
   
   };
   
-  const refreshTokenMiddleware2 = (req, res) => {
-    let refreshTokens = [];
+  // const refreshTokenMiddleware2 = (req, res) => {
+  //   let refreshTokens = [];
   
-    //take the refresh token from the user
-    const refreshToken = req.headers.authorization
+  //   //take the refresh token from the user
+  //   const refreshToken = req.headers.authorization
   
-    //send error if there is no token or it's invalid
-    if (refreshTokens.includes(refreshToken)) {
-      return res.status(403).json("Refresh token is not valid!");
-    }
-    jwt.verify(refreshToken, "your_secret_key", (err, user) => {
-      err && console.log(err);
-      refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+  //   //send error if there is no token or it's invalid
+  //   if (refreshTokens.includes(refreshToken)) {
+  //     return res.status(403).json("Refresh token is not valid!");
+  //   }
+  //   jwt.verify(refreshToken, "your_secret_key", (err, user) => {
+  //     err && console.log(err);
+  //     refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
   
-      const newAccessToken = generateAccessToken(user);
-      const newRefreshToken = generateRefreshToken(user);
+  //     const newAccessToken = generateAccessToken(user);
+  //     const newRefreshToken = generateRefreshToken(user);
   
-      refreshTokens.push(newRefreshToken);
+  //     refreshTokens.push(newRefreshToken);
   
-      res.status(200).json({
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
-      });
-    });
+  //     res.status(200).json({
+  //       accessToken: newAccessToken,
+  //       refreshToken: newRefreshToken,
+  //     });
+  //   });
   
-    //if everything is ok, create new access token, refresh token and send to user
-  };
+  //   //if everything is ok, create new access token, refresh token and send to user
+  // };
   
   const generateAccessToken = (user) => {
     
@@ -208,6 +208,5 @@ const deleteuser = async (req, res) => {
     apdateuser,
     deleteuser,
     refreshTokenMiddleware,
-    refreshTokenMiddleware2,
     profilePhotoUploadCtrl
     }

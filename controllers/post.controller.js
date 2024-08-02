@@ -10,7 +10,8 @@ const { cloudinaryUploadImage } = require('../MIDLLWARE/cloudinary.JS');
 const getAllPost = async (req, res) => {
     try {
       // Fetch all posts, sorted by _id in descending order
-      const todosposts = await Post1.find().sort({ _id: -1 }).exec();
+      const todosposts = await Post1.find().sort({ _id: -1 }).exec().populate("Module", ["-password"]);
+      ;
   
       // Create a new array with the updated formattedDate for each post
       const updatedPosts = todosposts.map(post => ({
@@ -150,7 +151,7 @@ const newPost = async (req, res) => {
       userId: admin._id,
       title,
       description,
-      srcProfile: admin.srcProfile,
+      srcProfile: admin.image.url,
       image: {
         url: result.secure_url,
         publicId: result.public_id,
@@ -176,16 +177,55 @@ const newPost = async (req, res) => {
 };
 
 
+// const mongoose = require("mongoose");
+// const Post = require("../models/post.model"); // Adjust the path to your Post model
+
+// const commentOnPost1 = async (req, res) => {
+//   try {
+//     const {postId,userId,text,srcProfile,nameC} = req.body;
+
+//     // Ensure userId and postId are ObjectId
+//     // const postObjectId = new mongoose.Types.ObjectId(postId);
+//     // const userObjectId = new mongoose.Types.ObjectId(userId);
+
+//     // Find the post by its ID and add the new comment
+//     const post = await Post1.findById(postId);
+//     if (!post) {
+//       return res.status(404).json({ error: "Post not found" });
+//     }
+
+//     const newComment = {
+//       text: text,
+//       user: userId,
+//       date: new Date(),
+//       srcProfile,
+//       nameC
+//     };
+
+//     // Setting formattedDate before saving
+//     newComment.formattedDate = formatDistanceToNow(newComment.date, { addSuffix: true });
+
+//     post.comments.push(newComment);
+//     await post.save();
+
+//     res.status(200).json(post);
+//   } catch (error) {
+//     console.error("Error in commentOnPost controller:", error);
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
+
   const commentOnPost = async (req, res) => {
     try {
-      const { text, _id, userId,srcProfile,nameC } = req.body;
+      const { text, postId, userId,srcProfile,nameC } = req.body;
   
       if (!text) {
         return res.status(400).json({ error: "Text field is required" });
       }
   
       // Validate and find post by its ID
-      const post = await Post1.findById(_id);
+      const post = await Post1.findById(postId);
   
       if (!post) {
         return res.status(404).json({ error: "Post not found" });
@@ -212,6 +252,8 @@ const newPost = async (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     }
   };
+
+
 
   const deletePost = async (req, res) => {
 	try {

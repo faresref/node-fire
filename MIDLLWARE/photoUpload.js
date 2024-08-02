@@ -29,3 +29,4 @@ const photoUpload = multer({
 });
 
 module.exports = photoUpload;
+
